@@ -12,22 +12,36 @@ class App extends Component {
     super();
     // set initial time:
     this.state = {
-      messages: []
+      messages: [], 
+      messagesRendered: []
     };
   }
+
+  onComponentDidUpdate() {
+
+    console.log("did mount");
+  }
   onDrop(acceptedFiles, rejectedFiles, context) {
-    console.log(this);
     const chatFile = acceptedFiles[0];
     const reader = new FileReader();
     reader.onload = function(event) {
       const lines = event.target.result.split('\n');
-      this.setState({ messages: lines });
+      this.setState({ messages: lines.slice(0, 10) });
       for(let i = 0; i < 10; i++){
         console.log(lines[i]);
       }
+      this.renderMessages();
     }.bind(context);
 
     reader.readAsText(chatFile);
+  }
+
+  renderMessages() {
+    const messagesRendered = []
+    this.state.messages.forEach((msg) => {
+      messagesRendered.push(<Message message={msg} />);
+    })
+    this.setState({ messagesRendered });
   }
 
   render() {
@@ -40,7 +54,7 @@ class App extends Component {
           <div>Try dropping some files here, or click to select files to upload.</div>
         </Dropzone>
 
-        {this.state.messages}
+        {this.state.messagesRendered}
       </div>
     );
   }
